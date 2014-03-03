@@ -15,18 +15,28 @@ ApplicationWindow {
         ColumnLayout {
             id: sidebarPane
             width: 300
-            Rectangle {
+            RowLayout {
                 Layout.fillWidth: true
                 anchors.bottomMargin: 10
-                height: subredditNameEdit.implicitHeight
-                color: "white"
-                TextEdit {
-                    id: subredditNameEdit
-                    anchors.fill: parent
+                Text {
+                    text: "subreddit: "
+                }
+                Rectangle {
                     Layout.fillWidth: true
-                    Keys.onReturnPressed: subredditListModel.subredditName = text
+                    height: subredditNameEdit.implicitHeight
+                    color: "white"
+                    border.width: 1
+                    border.color: "grey"
+                    radius: 3
+                    TextEdit {
+                        id: subredditNameEdit
+                        anchors.fill: parent
+                        Layout.fillWidth: true
+                        Keys.onReturnPressed: subredditListModel.subredditName = text
+                    }
                 }
             }
+
             ListView {
                 id: linkSelector
                 model: subredditListModel
@@ -37,6 +47,7 @@ ApplicationWindow {
                 spacing: 5
                 delegate: Text {
                     property string link: model.url
+                    property string comments: model.commentsUrl
                     width: parent.width
                     text: model.title
                     wrapMode: Text.Wrap
@@ -70,25 +81,23 @@ ApplicationWindow {
                 }
             }
         }
-        ColumnLayout {
+        SplitView {
             id: browserPane
             Layout.minimumWidth: 500
+            orientation: Qt.Vertical
+            handleDelegate: Rectangle {height: 1; color: "black"}
+            resizing: true
             WebView {
                 id: commentView
-                Layout.fillHeight: true
+                Layout.minimumHeight: parent.height / 4.0
                 Layout.fillWidth: true
-                url: linkSelector.currentItem ? linkSelector.currentItem.link : ""
+                url: linkSelector.currentItem ? linkSelector.currentItem.comments : ""
             }
             WebView {
                 id: webView
-                Layout.fillHeight: true
+                Layout.minimumHeight: parent.height / 4.0
                 Layout.fillWidth: true
                 url: linkSelector.currentItem ? linkSelector.currentItem.link : ""
-            }
-            ProgressBar {
-                Layout.fillWidth: true
-                id: webViewProgressBar
-                value: webView.progress
             }
         }
     }
